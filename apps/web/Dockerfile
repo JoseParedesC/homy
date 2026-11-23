@@ -8,4 +8,4 @@ ARG VITE_GOOGLE_CLIENT_ID
 RUN npm run build
 FROM nginx:1.27-alpine
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build web/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
