@@ -21,5 +21,5 @@ export const taskConfig:MasterCrudConfig<Task>={
  references:[{collection:"assignments",field:"taskId",description:"asignaciones"}],allowDeactivate:true,
  validationSchema:baseMasterSchema.extend({points:z.number().int().min(0),hasDueDate:z.boolean(),hasValue:z.boolean(),value:z.preprocess(empty,z.number().min(0).optional())})
   .refine(t=>!t.hasValue||(t.value??0)>0,{path:["value"],message:"Indica el valor si la tarea tiene valor definido."})};
-export const memberAdapter=makeAdapter(memberConfig,"members","memberId");
-export const taskAdapter=makeAdapter(taskConfig,"tasks","taskId");
+export const memberAdapter=makeAdapter(memberConfig);
+export const taskAdapter=makeAdapter(taskConfig);

@@ -1,0 +1,7 @@
+services:
+  db:
+    image: postgres:16
+    environment: {POSTGRES_USER: homy, POSTGRES_PASSWORD: homy, POSTGRES_DB: homy}
+    ports: ["5433:5432"]
+    volumes: [homy_pg:/var/lib/postgresql/data]
+volumes: {homy_pg: {}}

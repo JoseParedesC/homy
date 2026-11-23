@@ -1,0 +1,67 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"
+  url = env("DATABASE_URL") }
+
+// Member = usuario de Homy. pfUid enlaza con el usuario de personal-finance.
+model Member {
+  id String @id @default(uuid())
+  code String @unique
+  name String
+  email String? @unique
+  pfUid String? @unique
+  role String @default("member") // admin | member
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String @default("system")
+  updatedBy String @default("system")
+  assignments Assignment[]
+  contributions Contribution[]
+}
+model Task {
+  id String @id @default(uuid())
+  code String @unique
+  name String
+  points Int @default(0)
+  hasDueDate Boolean @default(false)
+  hasValue Boolean @default(false)
+  value Int?
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String @default("system")
+  updatedBy String @default("system")
+  assignments Assignment[]
+}
+model Assignment {
+  id String @id @default(uuid())
+  taskId String
+  memberId String
+  dueDate String?
+  status String @default("pending") // pending | done
+  doneAt DateTime?
+  earned Int @default(0)
+  createdAt DateTime @default(now())
+  task Task @relation(fields: [taskId], references: [id])
+  member Member @relation(fields: [memberId], references: [id])
+  notes Note[]
+}
+model Note {
+  id String @id @default(uuid())
+  assignmentId String
+  text String
+  delta Int @default(0)
+  by String
+  at DateTime @default(now())
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+}
+model Contribution {
+  id String @id @default(uuid())
+  memberId String
+  amount Int
+  date String
+  note String?
+  financeTxId String? // id del ingreso creado en personal-finance
+  createdAt DateTime @default(now())
+  member Member @relation(fields: [memberId], references: [id])
+}

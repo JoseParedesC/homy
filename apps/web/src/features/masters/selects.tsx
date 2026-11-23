@@ -1,4 +1,4 @@
-import{MasterSelector,type MasterSearchFn,type MasterSelectorProps}from"@kbayro/master-components";
+import{MasterSelector,type MasterSearchFn,type MasterSelectorProps}from"@joseparedesc/master-components";
 import{getDB,type Member,type Task}from"../../lib/store";
 import{searchPockets,type Pocket}from"../../lib/finance";
 import{money}from"../../ui";
