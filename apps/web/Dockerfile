@@ -1,7 +1,7 @@
 FROM node:20-slim AS build
 WORKDIR /app
 COPY . .
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 # Se fijan en build: defínelas como variables del servicio en Railway
 ARG VITE_API_URL
 ARG VITE_GOOGLE_CLIENT_ID
