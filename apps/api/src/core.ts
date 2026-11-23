@@ -13,4 +13,5 @@ export const parse=<S extends ZodTypeAny>(s:S,b:unknown):z.infer<S>=>{const r=s.
 export async function pf<T>(path:string,token:string,init:{method?:string;body?:unknown}={}):Promise<T>{
  let r:Response;try{r=await fetch(`${process.env.FINANCE_API_URL}/api${path}`,{method:init.method,body:init.body?JSON.stringify(init.body):undefined,headers:{"Content-Type":"application/json",...(token?{Authorization:`Bearer ${token}`}:{})}})}
  catch{throw new BadRequestException({message:"No hay conexión con personal-finance."})}
+ if(r.status===401&&token)throw new UnauthorizedException({message:"La sesión de personal-finance expiró. Vuelve a iniciar sesión."});
  const b:any=await r.json().catch(()=>({}));if(!r.ok)throw new BadRequestException({message:[b.message].flat().filter(Boolean).join(", ")||`personal-finance respondió ${r.status}`});return b as T}
