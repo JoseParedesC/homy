@@ -16,6 +16,12 @@
 - [ ] Mismo Google Client ID en Homy (front) y personal-finance (`GOOGLE_CLIENT_ID`), y dominio de `web` en *Authorized JavaScript origins*.
 - [ ] Revisar en navegador estilo, animaciones y el selector (teclado, Esc, paginación).
 
+## Hecho: usuarios con correo y penalizaciones
+- [x] Integrantes con correo; vinculación con personal-finance al primer ingreso; acceso solo a correos registrados; el responsable marca sus tareas.
+- [x] Penalizaciones (negativas, con motivo y tarea opcional) y ranking que las incluye junto con las notas negativas. Migración `20261124000000_penalties`.
+- [ ] Verificar en vivo: ingreso de un integrante registrado, rechazo de un correo no registrado, aplicar y quitar una penalización.
+- [ ] Un aporte registrado por el administrador para otro integrante solo llega a personal-finance cuando ese integrante lo envía (no hay forma de escribir en su cuenta sin su sesión).
+
 ## Por implementar
 - [ ] **Coincidencia estricta con un usuario preexistente en personal-finance:** su `POST /api/auth/google` crea al usuario si no existe y no hay endpoint de consulta. Hoy la identidad queda enlazada por el `uid` que devuelve personal-finance, pero no se bloquea a quien no existía. Requiere un endpoint nuevo allá (p. ej. consulta por email) o una lista de correos permitidos en Homy.
 - [ ] Multi-hogar: hoy todos los usuarios comparten un único hogar (el primero en entrar es admin).

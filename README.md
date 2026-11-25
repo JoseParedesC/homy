@@ -13,8 +13,19 @@ Tareas del hogar, puntajes y aportes. `apps/api` (NestJS + Prisma + PostgreSQL) 
 Login con Google en el front → `POST /api/auth/google` de Homy → reenvía el ID token a `POST /api/auth/google` de personal-finance. El `uid` que devuelve personal-finance se guarda en `Member.pfUid`, y su JWT viaja dentro del JWT de Homy para crear ingresos (`POST /api/transactions`) y leer bolsillos (`GET /api/pockets`) desde el servidor. Ambos servicios deben usar el **mismo Google Client ID**. `GET /api/finance/status` verifica conexión y que el `uid` de la sesión coincida con `/api/auth/me` de personal-finance.
 El primer usuario en entrar es administrador; los siguientes entran como integrantes.
 
+## Usuarios y acceso
+- El administrador registra a cada integrante en **Maestros → Integrantes** con su **correo de Google** (el mismo de su cuenta de personal-finance).
+- Al entrar con Google, Homy lo reconoce por ese correo y guarda su `uid` de personal-finance ("Cuenta: Vinculada"). Desde ahí puede entrar y **marcar como realizadas sus tareas asignadas** (solo el responsable puede hacerlo).
+- Solo entran correos registrados. El primer usuario crea el hogar como administrador. `OPEN_REGISTRATION=true` en el API reabre el registro a cualquiera.
+- Los aportes se envían a personal-finance **desde la cuenta de su titular**: si el administrador registra un aporte de otro integrante, queda pendiente hasta que ese integrante lo envíe.
+
+## Puntos y penalizaciones
+- Puntaje = puntos de tareas hechas + anotaciones del administrador (suman o restan) + penalizaciones.
+- **Penalizar** (pestaña Puntajes, solo administrador): integrante, puntos a restar, motivo obligatorio y tarea relacionada opcional. Se pueden quitar.
+- Las anotaciones con puntos negativos cuentan como penalización en el total restado de cada integrante.
+
 ## API de Homy (`/api`, Bearer JWT)
-`/auth/google`, `/auth/me` · `/state` · `/members`, `/tasks` (contrato master-crud) · `/assignments`, `/assignments/:id/toggle`, `/assignments/:id/notes` · `/contributions`, `/contributions/:id/sync` · `/finance/status`, `/finance/pockets`.
+`/auth/google`, `/auth/me` · `/state` · `/members`, `/tasks` (contrato master-crud) · `/assignments`, `/assignments/:id/toggle`, `/assignments/:id/notes` · `/contributions`, `/contributions/:id/sync` · `/penalties` (POST, DELETE `/:id`), `/finance/status`, `/finance/pockets`.
 
 ## Deploy en Railway
 Un proyecto con 3 servicios, todos con el repo completo como *Root Directory* (déjalo en `/`):

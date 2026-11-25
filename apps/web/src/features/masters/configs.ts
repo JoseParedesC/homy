@@ -5,11 +5,12 @@ const empty=(v:unknown)=>v===""||(typeof v==="number"&&Number.isNaN(v))?undefine
 const date=(v:unknown)=>v?new Date(String(v)).toLocaleDateString("es-CO"):"—";
 export const memberConfig:MasterCrudConfig<Member>={
  collection:"members",title:"Integrantes",singularTitle:"Integrante",codeField:"code",nameField:"name",searchableFields:["code","name"],
- columns:[{field:"code",label:"Código",sortable:true},{field:"name",label:"Nombre",sortable:true},{field:"role",label:"Rol",render:v=>v==="admin"?"Administrador":"Integrante"},{field:"active",label:"Estado"}],
+ columns:[{field:"code",label:"Código",sortable:true},{field:"name",label:"Nombre",sortable:true},{field:"email",label:"Correo",render:v=>String(v??"—")},{field:"pfUid",label:"Cuenta",render:(_,r)=>r.email?(r.pfUid?"Vinculada":"Pendiente de ingreso"):"Sin correo"},{field:"role",label:"Rol",render:v=>v==="admin"?"Administrador":"Integrante"},{field:"active",label:"Estado"}],
  formFields:[{name:"code",label:"Código",type:"text",required:true,disabledOnEdit:true,helperText:"No se puede modificar después de creado."},{name:"name",label:"Nombre",type:"text",required:true},
+  {name:"email",label:"Correo (Google / personal-finance)",type:"text",helperText:"Con este correo entra a Homy y se vincula a su cuenta de personal-finance."},
   {name:"role",label:"Rol",type:"select",required:true,options:[{value:"member",label:"Integrante"},{value:"admin",label:"Administrador"}]}],
  references:[{collection:"assignments",field:"memberId",description:"asignaciones"}],allowDeactivate:true,
- validationSchema:baseMasterSchema.extend({role:z.enum(["admin","member"])})};
+ validationSchema:baseMasterSchema.extend({role:z.enum(["admin","member"]),email:z.preprocess(v=>v===""?null:v,z.string().trim().toLowerCase().email("Correo inválido").nullish())})};
 export const taskConfig:MasterCrudConfig<Task>={
  collection:"tasks",title:"Tareas del hogar",singularTitle:"Tarea",codeField:"code",nameField:"name",searchableFields:["code","name"],
  columns:[{field:"code",label:"Código",sortable:true},{field:"name",label:"Tarea",sortable:true},{field:"points",label:"Puntos",sortable:true,render:v=>String(v??0)},

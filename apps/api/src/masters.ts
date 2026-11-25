@@ -1,7 +1,8 @@
 import{Body,ConflictException,Controller,Delete,Get,HttpCode,Inject,Param,Patch,Post,Query,UseGuards}from"@nestjs/common";import{z}from"zod";
 import{admin,CurrentMe,JwtGuard,Me,parse,Prisma}from"./core";
 const base={code:z.string().regex(/^[A-Za-z0-9_-]{1,20}$/),name:z.string().trim().min(1).max(80),active:z.boolean().optional()};
-const memberS=z.object({...base,role:z.enum(["admin","member"])});
+const email=z.preprocess(v=>typeof v==="string"&&v.trim()===""?null:v,z.string().trim().toLowerCase().email("Correo inválido").max(120).nullish());
+const memberS=z.object({...base,role:z.enum(["admin","member"]),email});
 const taskS=z.object({...base,points:z.number().int().min(0),hasDueDate:z.boolean(),hasValue:z.boolean(),value:z.number().int().min(0).nullish()})
  .refine(t=>!t.hasValue||(t.value??0)>0,{path:["value"],message:"Indica el valor si la tarea tiene valor definido."});
 // Contrato REST de @joseparedesc/master-crud: list(search,status), get, create, PATCH, PATCH /active, GET /references, DELETE (409 {referencedBy}).
@@ -9,10 +10,12 @@ function master(path:string,model:"member"|"task",ref:"memberId"|"taskId",create
  @Controller(path) @UseGuards(JwtGuard) class C{
   constructor(@Inject(Prisma) private p:Prisma){}
   private get d(){return(this.p as any)[model]}
-  private async refs(id:string){const count=await this.p.assignment.count({where:{[ref]:id}});return count?[{description:"asignaciones",count}]:[]}
+  private async refs(id:string){const q=[{description:"asignaciones",count:await this.p.assignment.count({where:{[ref]:id}})}];
+   if(model==="member")q.push({description:"aportes",count:await this.p.contribution.count({where:{memberId:id}})},{description:"penalizaciones",count:await this.p.penalty.count({where:{memberId:id}})});
+   return q.filter(x=>x.count>0)}
   private async keepAdmin(id:string,loses:boolean){if(model!=="member"||!loses)return;const m=await this.p.member.findUnique({where:{id}});
    if(m?.role==="admin"&&m.active&&await this.p.member.count({where:{role:"admin",active:true,id:{not:id}}})===0)throw new ConflictException({message:"Debe existir al menos un administrador activo."})}
-  private async w<T>(f:()=>Promise<T>){try{return await f()}catch(e:any){if(e.code==="P2002")throw new ConflictException({message:"Ya existe un registro con ese código."});throw e}}
+  private async w<T>(f:()=>Promise<T>){try{return await f()}catch(e:any){if(e.code==="P2002")throw new ConflictException({message:String(e.meta?.target).includes("email")?"Ya existe un integrante con ese correo.":"Ya existe un registro con ese código."});throw e}}
   @Get() list(@Query("search") s?:string,@Query("status") st?:string){return this.d.findMany({orderBy:{name:"asc"},where:{...(st==="active"?{active:true}:st==="inactive"?{active:false}:{}),...(s?.trim()?{OR:[{code:{contains:s.trim(),mode:"insensitive"}},{name:{contains:s.trim(),mode:"insensitive"}}]}:{})}})}
   @Get(":id") get(@Param("id") id:string){return this.d.findUnique({where:{id}})}
   @Get(":id/references") references(@Param("id") id:string){return this.refs(id)}

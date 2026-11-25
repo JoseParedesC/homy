@@ -22,6 +22,7 @@ model Member {
   updatedBy String @default("system")
   assignments Assignment[]
   contributions Contribution[]
+  penalties Penalty[]
 }
 model Task {
   id String @id @default(uuid())
@@ -50,6 +51,7 @@ model Assignment {
   task Task @relation(fields: [taskId], references: [id])
   member Member @relation(fields: [memberId], references: [id])
   notes Note[]
+  penalties Penalty[]
 }
 model Note {
   id String @id @default(uuid())
@@ -69,4 +71,16 @@ model Contribution {
   financeTxId String? // id del ingreso creado en personal-finance
   createdAt DateTime @default(now())
   member Member @relation(fields: [memberId], references: [id])
+}
+
+model Penalty {
+  id           String      @id @default(uuid())
+  memberId     String
+  assignmentId String?
+  points       Int // siempre negativo
+  reason       String
+  by           String
+  createdAt    DateTime    @default(now())
+  member       Member      @relation(fields: [memberId], references: [id])
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
 }
