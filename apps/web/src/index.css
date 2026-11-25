@@ -9,6 +9,6 @@
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}
 @keyframes pop{50%{transform:scale(1.25)}}
 .rise{animation:rise .45s cubic-bezier(.2,.7,.2,1)}
-.collapse{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.collapse.open{grid-template-rows:1fr}.collapse>div{overflow:hidden}
+.reveal{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.reveal.open{grid-template-rows:1fr}.reveal>div{overflow:hidden}
 .hogar.ms-root{--ms-accent:#1F6D5A;--ms-accent-soft:#E7F3EF;--ms-border:#E2E5E0;--ms-radius:12px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

@@ -1,12 +1,14 @@
-import{useSyncExternalStore}from"react";import type{MasterEntity}from"@joseparedesc/master-crud";
+import{useSyncExternalStore}from"react";import type{MasterEntity}from"@joseparedesc/master-crud";import type{Entry,Row}from"./period";
 export type Role="admin"|"member";
 export interface Member extends MasterEntity{role:Role;email?:string|null;pfUid?:string|null}
+export interface Snapshot{rows:(Row&{name:string})[];entries:Entry[]}
+export interface MonthClose{id:string;month:string;closedAt:string;closedBy:string;snapshot:Snapshot}
 export interface Penalty{id:string;memberId:string;assignmentId?:string|null;points:number;reason:string;by:string;createdAt:string}
 export interface Task extends MasterEntity{hasDueDate:boolean;hasValue:boolean;value?:number;points:number}
 export interface Note{id:string;text:string;delta:number;by:string;at:string}
 export interface Assignment{id:string;taskId:string;memberId:string;dueDate?:string;status:"pending"|"done";doneAt?:string;earned:number;notes:Note[]}
 export interface Contribution{id:string;memberId:string;amount:number;date:string;note?:string|null;synced?:boolean}
-export interface DB{members:Member[];tasks:Task[];assignments:Assignment[];contributions:Contribution[];penalties:Penalty[];me:string}
+export interface DB{members:Member[];tasks:Task[];assignments:Assignment[];contributions:Contribution[];penalties:Penalty[];closes:MonthClose[];me:string}
 export const API=(import.meta.env.VITE_API_URL as string|undefined)??"http://localhost:4000";
 const TK="homy:token";export const token=()=>sessionStorage.getItem(TK);
 let db:DB|null=null;const subs=new Set<()=>void>(),emit=()=>subs.forEach(s=>s());
@@ -36,3 +38,8 @@ export const syncContribution=(id:string,pocketId?:string)=>run(api(`/contributi
 export const setMe=(_:string)=>{};
 export const penalize=(memberId:string,points:number,reason:string,assignmentId?:string)=>run(api("/penalties",{method:"POST",body:{memberId,points,reason,assignmentId}}));
 export const removePenalty=(id:string)=>run(api(`/penalties/${id}`,{method:"DELETE"}));
+// Cierre mensual (YYYY-MM en hora local, igual que los cortes de periodo)
+export const monthKey=(d:Date|string)=>new Date(d).toLocaleDateString("en-CA").slice(0,7);
+export const isClosed=(d:DB,when:Date|string)=>d.closes.some(c=>c.month===monthKey(when));
+export const closeMonth=(month:string,snapshot:Snapshot)=>run(api("/closes",{method:"POST",body:{month,snapshot}}));
+export const reopenMonth=(month:string)=>run(api(`/closes/${month}`,{method:"DELETE"}));

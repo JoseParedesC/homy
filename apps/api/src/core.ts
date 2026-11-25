@@ -15,3 +15,5 @@ export async function pf<T>(path:string,token:string,init:{method?:string;body?:
  catch{throw new BadRequestException({message:"No hay conexión con personal-finance."})}
  if(r.status===401&&token)throw new UnauthorizedException({message:"La sesión de personal-finance expiró. Vuelve a iniciar sesión."});
  const b:any=await r.json().catch(()=>({}));if(!r.ok)throw new BadRequestException({message:[b.message].flat().filter(Boolean).join(", ")||`personal-finance respondió ${r.status}`});return b as T}
+// Mes (YYYY-MM) de una fecha en la zona horaria del hogar.
+export const monthOf=(d:Date)=>new Intl.DateTimeFormat("en-CA",{timeZone:process.env.APP_TIMEZONE??"America/Bogota"}).format(d).slice(0,7);

@@ -23,9 +23,12 @@ El primer usuario en entrar es administrador; los siguientes entran como integra
 - Puntaje = puntos de tareas hechas + anotaciones del administrador (suman o restan) + penalizaciones.
 - **Penalizar** (pestaña Puntajes, solo administrador): integrante, puntos a restar, motivo obligatorio y tarea relacionada opcional. Se pueden quitar.
 - Las anotaciones con puntos negativos cuentan como penalización en el total restado de cada integrante.
+- **Puntajes** tiene tres vistas: **Ranking**, **Penalizaciones** (puntos restados, filtro por integrante y detalle agrupado por día) y **Consolidado mensual** (tabla por integrante con tareas, bonos, notas negativas, penalizaciones y neto, gráfico de penalizaciones por día y exportación a CSV).
+- **Cierre mensual** (Consolidado mensual, solo administrador): **Cerrar mes** congela las notas, penalizaciones (crear y quitar) y marcar/reabrir tareas de ese mes; el servidor rechaza esos cambios y el consolidado pasa a mostrar la foto guardada al cierre. **Reabrir mes** lo desbloquea. No se puede cerrar un mes futuro. El mes de cada movimiento se decide con `APP_TIMEZONE` en el API (por defecto `America/Bogota`); debe coincidir con la zona horaria de los usuarios.
+- **Cortes por fecha:** selector de periodo (mes con navegación, rango con atajos de 7/30 días, o todo). Cada movimiento cuenta en la fecha en que ocurrió (tarea: cuando se marcó hecha), en hora local.
 
 ## API de Homy (`/api`, Bearer JWT)
-`/auth/google`, `/auth/me` · `/state` · `/members`, `/tasks` (contrato master-crud) · `/assignments`, `/assignments/:id/toggle`, `/assignments/:id/notes` · `/contributions`, `/contributions/:id/sync` · `/penalties` (POST, DELETE `/:id`), `/finance/status`, `/finance/pockets`.
+`/auth/google`, `/auth/me` · `/state` · `/members`, `/tasks` (contrato master-crud) · `/assignments`, `/assignments/:id/toggle`, `/assignments/:id/notes` · `/contributions`, `/contributions/:id/sync` · `/penalties` (POST, DELETE `/:id`), `/closes` (POST, DELETE `/:month`), `/finance/status`, `/finance/pockets`.
 
 ## Deploy en Railway
 Un proyecto con 3 servicios, todos con el repo completo como *Root Directory* (déjalo en `/`):

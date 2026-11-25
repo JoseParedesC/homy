@@ -84,3 +84,12 @@ model Penalty {
   member       Member      @relation(fields: [memberId], references: [id])
   assignment   Assignment? @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
 }
+
+// Cierre mensual: congela los movimientos de puntos del mes y guarda la foto del consolidado.
+model MonthClose {
+  id       String   @id @default(uuid())
+  month    String   @unique // YYYY-MM (zona horaria APP_TIMEZONE)
+  closedAt DateTime @default(now())
+  closedBy String
+  snapshot Json
+}
